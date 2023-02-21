@@ -7,11 +7,6 @@ interface Coordinates {
   y: number[];
 }
 
-interface ProgramStatistics {
-  name: string;
-  coordinates: Coordinates;
-}
-
 const hwRouter = express.Router();
 
 hwRouter.post("/createHwInfo", async (req, res) => {
@@ -226,42 +221,6 @@ hwRouter.get("/allStatistics/:hwInfoId", async (req, res) => {
     res.status(500).json(err);
   }
 });
-/*
-hwRouter.get("/allStatisticsPerPrograms/:hwInfoId", async (req, res) => {
-  const hwInfoId = parseInt(req.params["hwInfoId"]);
-  try {
-    const allHwStatistics = await prisma.hwStatistics.findMany({
-      where: {
-        hwInfoId: hwInfoId,
-      },
-      select: {
-        programName: true,
-        cpuTemperature: true,
-        createdAt: true,
-      },
-    });
-
-    let parsedData: [ProgramStatistics] = [{
-      name: '',
-      coordinates: { x: [], y: [] },
-    }]
-
-    parsedData.filter(x => x.name)
-    parsedData.forEach((element) =>  {
-      element.name
-    })
-
-    allHwStatistics.forEach((element) => {
-      parsedData.push()
-      parsedData[1].x.push(element.createdAt);
-    });
-
-    return res.json(parsedData);
-  } catch (err) {
-    console.log(err);
-    res.status(500).json(err);
-  }
-});*/
 
 hwRouter.get("/lastTempCpu/:hwInfoId", async (req, res) => {
   const hwInfoId = parseInt(req.params["hwInfoId"]);

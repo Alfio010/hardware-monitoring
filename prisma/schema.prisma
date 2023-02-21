@@ -15,11 +15,12 @@ model HwInfos {
   gpu          String?
   HwStatistics HwStatistics[]
   createdAt    DateTime       @default(now())
-	@@map("HwInfo")
+
+  @@map("HwInfo")
 }
 
 model HwStatistics {
-  hwStatsId      Int          @id @default(autoincrement())
+  hwStatsId      Int           @id @default(autoincrement())
   hwRelation     HwInfos?      @relation(fields: [hwInfoId], references: [hwInfoId])
   hwInfoId       Int
   cpuUsage       Int
@@ -27,7 +28,7 @@ model HwStatistics {
   gpuUsage       Int?
   programInUse   ProgramNames? @relation(fields: [programName], references: [name])
   programName    String?
-  createdAt      DateTime     @default(now())
+  createdAt      DateTime      @default(now())
 }
 
 model ProgramNames {
@@ -35,5 +36,6 @@ model ProgramNames {
   name         String         @unique
   HwStatistics HwStatistics[]
   createdAt    DateTime       @default(now())
-	@@map("ProgramName")
+
+  @@map("ProgramName")
 }
