@@ -1,0 +1,22 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Client py",
+      "type": "python",
+      "request": "launch",
+      "program": "${file}",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "Main",
+      "runtimeArgs": ["-r", "ts-node/register/transpile-only"],
+      "program": "${workspaceFolder}/src/main.ts",
+      //"runtimeVersion": "16.14.2",
+      "request": "launch",
+      "skipFiles": ["<node_internals>/**"],
+      "type": "node"
+    }
+  ]
+}

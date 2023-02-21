@@ -1,0 +1,39 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:../data/database.sqlite"
+}
+
+model HwInfos {
+  hwInfoId     Int            @id @default(autoincrement())
+  hwName       String
+  os           String
+  cpu          String?
+  gpu          String?
+  HwStatistics HwStatistics[]
+  createdAt    DateTime       @default(now())
+	@@map("HwInfo")
+}
+
+model HwStatistics {
+  hwStatsId      Int          @id @default(autoincrement())
+  hwRelation     HwInfos?      @relation(fields: [hwInfoId], references: [hwInfoId])
+  hwInfoId       Int
+  cpuUsage       Int
+  cpuTemperature Int
+  gpuUsage       Int?
+  programInUse   ProgramNames? @relation(fields: [programName], references: [name])
+  programName    String?
+  createdAt      DateTime     @default(now())
+}
+
+model ProgramNames {
+  programId    Int            @id @default(autoincrement())
+  name         String         @unique
+  HwStatistics HwStatistics[]
+  createdAt    DateTime       @default(now())
+	@@map("ProgramName")
+}

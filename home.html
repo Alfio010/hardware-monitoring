@@ -1,0 +1,222 @@
+<html>
+  <head>
+    <script src="https://cdn.plot.ly/plotly-2.17.1.min.js"></script>
+  </head>
+
+  <body>
+    <div id="select">
+      <select id="mySelector" onchange="changeHw()"></select>
+    </div>
+
+    <div id="hwInfo">
+      <span id="hwName">Name</span>
+      <span id="hwOs">OS</span>
+      <span id="hwCpu">CPU</span>
+    </div>
+
+    <div id="realTimeCpu">
+      <div id="cpuTemp" style="float: left; margin-left: auto"></div>
+
+      <div id="cpuUsage" style="float: right; margin-left: auto"></div>
+    </div>
+
+    <div id="linear" style="margin-top: 35%"></div>
+    <script>
+      let hwInfoId = 1;
+
+      function changeHw() {
+        const selector = document.getElementById("mySelector");
+        hwInfoId = selector.options[selector.selectedIndex].value;
+
+        getHwInfo();
+        getCpuTemp();
+        getLastCpuTemp();
+      }
+
+      function changeHwInfo(hwInfoData) {
+        document.getElementById("hwName").textContent = hwInfoData.hwName;
+        document.getElementById("hwOs").textContent = hwInfoData.os;
+        document.getElementById("hwCpu").textContent = hwInfoData.cpu;
+      }
+
+      function getHwInfo() {
+        const xhttp = new XMLHttpRequest();
+
+        xhttp.onload = function () {
+          console.log(this.responseText);
+          changeHwInfo(JSON.parse(this.responseText));
+        };
+
+        xhttp.open("GET", "./hwInfo/" + hwInfoId);
+        xhttp.setRequestHeader("Content-Type", "application/json");
+        xhttp.send();
+      }
+
+      function getAllHws() {
+        const xhttp = new XMLHttpRequest();
+
+        xhttp.onload = function () {
+          generateSelector(JSON.parse(this.responseText));
+        };
+
+        xhttp.open("GET", "./allHwInfoIds/");
+        xhttp.setRequestHeader("Content-Type", "application/json");
+        xhttp.send();
+      }
+
+      function generateSelector(HwInfoIds) {
+        const selector = document.getElementById("mySelector");
+
+        for (const hwInfoId in HwInfoIds) {
+          const elementHw = HwInfoIds[hwInfoId];
+          console.log("generateSelector" + elementHw);
+
+          const hwName = elementHw.hwName;
+          let isDuplicate = false;
+
+          for (const option of selector.options) {
+            if (option.text == hwName) {
+              isDuplicate = true;
+              break;
+            }
+          }
+
+          if (!isDuplicate) {
+            let option = document.createElement("option");
+            option.text = hwName;
+            option.value = elementHw.hwInfoId;
+            selector.add(option, elementHw.hwInfoId);
+          }
+        }
+      }
+
+      function getCpuTemp() {
+        const xhttp = new XMLHttpRequest();
+
+        xhttp.onload = function () {
+          console.log(this.responseText);
+          generateLinearGraph(JSON.parse(this.responseText));
+        };
+
+        xhttp.open("GET", "./allStatistics/" + hwInfoId);
+        xhttp.setRequestHeader("Content-Type", "application/json");
+        xhttp.send();
+      }
+
+      function getLastCpuTemp() {
+        const xhttp = new XMLHttpRequest();
+
+        xhttp.onload = function () {
+          const value = Number.parseInt(this.responseText);
+
+          const settings = {
+            axis: { range: [0, 120] },
+            steps: [
+              { range: [0, 40], color: "gray" },
+
+              { range: [41, 75], color: "orange" },
+
+              { range: [76, 120], color: "red" },
+            ],
+          };
+
+          generateCircularGraph(value, "CPU temperature", settings, "cpuTemp");
+        };
+
+        xhttp.open("GET", "./lastTempCpu/" + hwInfoId);
+        xhttp.setRequestHeader("Content-Type", "application/json");
+        xhttp.send();
+      }
+
+      function getLastCpuUsage() {
+        const xhttp = new XMLHttpRequest();
+
+        xhttp.onload = function () {
+          value = Number.parseInt(this.responseText);
+
+          const settings = {
+            axis: { range: [0, 100] },
+            steps: [
+              { range: [0, 40], color: "gray" },
+
+              { range: [41, 75], color: "orange" },
+
+              { range: [76, 100], color: "red" },
+            ],
+          };
+
+          generateCircularGraph(value, "CPU usage", settings, "cpuUsage");
+        };
+
+        xhttp.open("GET", "./lastUsageCpu/" + hwInfoId);
+        xhttp.setRequestHeader("Content-Type", "application/json");
+        xhttp.send();
+      }
+
+      function generateMultipleLinearGraph(parsedData) {
+        parsedData.mode = "lines";
+        let a = [parsedData, parsedData];
+        a.push(o);
+
+        Plotly.newPlot("linear", {
+          data: a,
+          layout: { width: 800, height: 600 },
+        });
+      }
+
+      function generateLinearGraph(parsedData) {
+        parsedData.mode = "lines+markers";
+
+        Plotly.newPlot("linear", {
+          data: [parsedData],
+          layout: {
+            title: "CPU Temperature",
+            xaxis: {
+              title: "Date",
+            },
+            yaxis: {
+              title: "Temperature",
+            },
+            width: 800,
+            height: 600,
+          },
+        });
+      }
+
+      function generateCircularGraph(currValue, title, settings, id) {
+        const data = [
+          {
+            domain: { x: [0, 100], y: [0, 100] },
+
+            value: currValue,
+
+            title: { text: title },
+
+            type: "indicator",
+
+            mode: "gauge+number",
+
+            gauge: settings,
+          },
+        ];
+
+        const layout = { width: 800, height: 700, margin: { t: 0, b: 0 } };
+
+        Plotly.newPlot(id, data, layout);
+      }
+
+      getHwInfo();
+      getCpuTemp();
+      getLastCpuTemp();
+      getLastCpuUsage();
+      getAllHws();
+
+      setInterval(getCpuTemp, 10000);
+
+      setInterval(getLastCpuTemp, 5000);
+      setInterval(getLastCpuUsage, 5000);
+
+      setInterval(getAllHws, 20000);
+    </script>
+  </body>
+</html>
