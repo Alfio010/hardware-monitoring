@@ -24,7 +24,7 @@ hwRouter.post("/createHwInfo", async (req, res) => {
   }
 
   try {
-    const hwSearched = await prisma.hwInfo.findFirst({
+    const hwSearched = await prisma.hwInfos.findFirst({
       where: {
         hwName: body.hwName,
         os: body.os,
@@ -36,7 +36,7 @@ hwRouter.post("/createHwInfo", async (req, res) => {
       return res.status(208).json({ hwSearched, message: "Already exist" });
     }
 
-    const hwName = await prisma.hwInfo.create({
+    const hwName = await prisma.hwInfos.create({
       data: {
         hwName: body.hwName,
         os: body.os,
@@ -84,14 +84,14 @@ hwRouter.post("/createHwStatistics", async (req, res) => {
     let parsedProgramName: string | null = null;
 
     if (body.programInUse) {
-      const programName = await prisma.programName.findUnique({
+      const programName = await prisma.programNames.findUnique({
         where: {
           name: body.programInUse,
         },
       });
 
       if (!programName) {
-        const newProgramName = await prisma.programName.create({
+        const newProgramName = await prisma.programNames.create({
           data: {
             name: body.programInUse,
           },
@@ -127,7 +127,7 @@ hwRouter.post("/createHwStatistics", async (req, res) => {
 
 hwRouter.get("/allHwInfo", async (_req, res) => {
   try {
-    const allHwInfo = await prisma.hwInfo.findMany();
+    const allHwInfo = await prisma.hwInfos.findMany();
 
     return res.json(allHwInfo);
   } catch (err) {
@@ -137,7 +137,7 @@ hwRouter.get("/allHwInfo", async (_req, res) => {
 
 hwRouter.get("/allHwInfoIds", async (_req, res) => {
   try {
-    const allHwInfo = await prisma.hwInfo.findMany({
+    const allHwInfo = await prisma.hwInfos.findMany({
       select: {
         hwName: true,
         hwInfoId: true,
@@ -162,7 +162,7 @@ hwRouter.get("/allHwStatistics", async (_req, res) => {
 
 hwRouter.get("/all", async (_req, res) => {
   try {
-    const allHwStatistics = await prisma.hwInfo.findMany({
+    const allHwStatistics = await prisma.hwInfos.findMany({
       include: {
         HwStatistics: true,
       },
@@ -177,7 +177,7 @@ hwRouter.get("/all", async (_req, res) => {
 hwRouter.get("/hwInfo/:hwInfoId", async (req, res) => {
   const hwInfoId = parseInt(req.params["hwInfoId"]);
   try {
-    const hwInfos = await prisma.hwInfo.findFirst({
+    const hwInfos = await prisma.hwInfos.findFirst({
       where: {
         hwInfoId: hwInfoId,
       },

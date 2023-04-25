@@ -1,4 +1,4 @@
-FROM node:lts-alpine
+FROM node:20.0.0-alpine3.16
 
 WORKDIR /app
 
@@ -8,7 +8,6 @@ COPY ./package-lock.json ./
 COPY ./src ./src
 COPY ./prisma ./prisma
 
-RUN npm install --save-dev -g ts-node typescript
 RUN npm i 
 RUN npx prisma generate
 
