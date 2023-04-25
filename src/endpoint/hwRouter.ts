@@ -1,17 +1,12 @@
 import express from "express";
 import { resolve } from "path";
 import prisma from "../main";
-
-interface Coordinates {
-  x: Date[];
-  y: number[];
-}
+import { Coordinates, IHw, IHwStatistic } from "./interfaces";
 
 const hwRouter = express.Router();
 
 hwRouter.post("/createHwInfo", async (req, res) => {
-  const body: { hwName: string; os: string; cpu?: string; gpu?: string } =
-    req.body;
+  const body: IHw = req.body;
 
   if (!body.hwName) {
     console.log("hwName not given!");
@@ -57,13 +52,7 @@ hwRouter.post("/createHwInfo", async (req, res) => {
 });
 
 hwRouter.post("/createHwStatistics", async (req, res) => {
-  const body: {
-    hwInfoId: number;
-    cpuUsage: number;
-    cpuTemperature: number;
-    gpuUsage?: number;
-    programInUse?: string;
-  } = req.body;
+  const body: IHwStatistic = req.body;
 
   if (!body.hwInfoId) {
     console.log("hwInfoId not given!");

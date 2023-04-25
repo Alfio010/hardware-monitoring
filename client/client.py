@@ -122,12 +122,15 @@ def get_cpu_percent_usage():
 
 
 def get_cpu_temperatures():
-    stringTemp = str(psutil.sensors_temperatures())
-    INIT = stringTemp.find('current', stringTemp.find(
-        'coretemp'), stringTemp.__len__())
-    temp = stringTemp[INIT + 8:INIT + 8 + 2]
-    if (temp.isdigit()):
-        return int(temp)
+    if OS_NAME == "Linux":
+        stringTemp = str(psutil.sensors_temperatures())
+        INIT = stringTemp.find('current', stringTemp.find(
+            'coretemp'), stringTemp.__len__())
+        temp = stringTemp[INIT + 8:INIT + 8 + 2]
+        if (temp.isdigit()):
+            return int(temp)
+        else:
+            return -1
     else:
         return -1
 
